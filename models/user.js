@@ -9,10 +9,11 @@ const userSchema=new Schema({
             message:"not a vaild email"
         }
     },
-    phone:{type:Number,unique:true},
+    phone:{type:Number},
     password:{type:String,required:true},
     avatar:{type:String,default:"/images.png"},
-    addresses:[{type:String}]
+    addresses:[{type:String}],
+    isAdmin:{type:Boolean,default:false}
 })
 
 userSchema.pre('save', function(next) {

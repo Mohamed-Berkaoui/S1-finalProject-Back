@@ -1,9 +1,11 @@
 const express = require("express");
 const asyncHandler = require("./utils/asyncHandler");
-const customError = require("./utils/CustemError");
+const customError = require("./utils/customResponces");
 const { default: mongoose } = require("mongoose");
 const path=require('path');
 const ProductRouter = require("./routes/product");
+const AuthRouter = require("./routes/auth");
+
 
 require("dotenv").config();
 
@@ -14,7 +16,7 @@ app.use(express.json())
 
 
 app.use('/api/product',ProductRouter)
-// app.use('/api/auth',AuthRouter)
+app.use('/api/auth',AuthRouter)
 // app.use('/api/order',OrderRouter)
 // app.use('/api/auth',AuthRouter)
 
@@ -31,9 +33,10 @@ app.all(
 
 //errror handler
 app.use(function (error, req, res, next) {
+
   res
     .status(error.statusCode)
-    .json({ status: error.status || "error", error: error.message });
+    .json({ status: error.status , error: error.message });
 });
 
 const PORT = process.env.PORT || 8000;
@@ -45,4 +48,4 @@ mongoose
       console.log(`server running on http://localhost:${PORT}`)
     )
   )
-  .catch((error)=>console.log(error))
+  .catch((error)=>console.log(error)) 

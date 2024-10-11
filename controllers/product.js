@@ -1,6 +1,11 @@
 const { validationResult } = require("express-validator");
 const ProductModel = require("../models/product");
-const customError = require("../utils/CustemError");
+const {
+  customError,
+  customFail,
+  customSuccess,
+} = require("../utils/customResponces");
+
 /**
  * @method : get
  * @route : ~/api/product/
@@ -10,9 +15,9 @@ const customError = require("../utils/CustemError");
 async function getAllProductsController(req, res) {
   const products = await ProductModel.find();
   if (!products.length) {
-    throw new customError("no products found", "fail", 400);
+    throw new customFail("no products found");
   }
-  res.json({ status: "success", data: products });
+  res.json(new customSuccess(products));
 }
 
 /**
@@ -22,13 +27,14 @@ async function getAllProductsController(req, res) {
  * @access : visitor
  */
 async function getProductsPaginationController(req, res) {
-  const products = await ProductModel.find()
+  const title = new RegExp(req.query.title, "i");
+  let products = await ProductModel.find({ title: title })
     .skip((+req.query.page - 1) * +req.query.posts)
     .limit(req.query.posts);
   if (!products.length) {
-    throw new customError("no products found", "fail", 400);
+    throw new customFail("no product found");
   }
-  res.json({ status: "success", data: products });
+  res.json(new customSuccess(products));
 }
 
 /**
@@ -86,7 +92,9 @@ async function getMostPopularProductsController(req, res) {
  * @access : admin
  */
 async function postNewProductController(req, res) {
+  console.log(req.user.id)
   const result = validationResult(req);
+  console.log('hellop')
 
   if (!result.isEmpty()) {
     throw new customError(
@@ -95,22 +103,41 @@ async function postNewProductController(req, res) {
       400
     );
   }
-  var newProd
-try {
-     newProd=  await ProductModel.create(req.body)
-     
-} catch (error) {
-    throw new customError(error.message,"errorrrrr",400)
+  var newProd;
+  try {
+    newProd = await ProductModel.create(req.body);
+  } catch (error) {
+    throw new customError(error.message, "errorrrrr", 400);
+  }
+  res.json({ status: "success", data: newProd });
 }
-    console.log("🚀 ~ postNewProductController ~ newProd:", newProd)
-    res.json({status:"success",data:newProd})
 
+/**
+ * @method : put
+ * @route : ~/api/product/update/:id
+ * @desc  : update  exist product
+ * @access : admin
+ */
+async function updateProductController(req, res) {
+  const product = await ProductModel.findById(req.params.id);
+  if (!product) {
+    throw new customFail("product not found");
+  }
+
+  const updatedProd = await ProductModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { returnDocument: "after" }
+  );
+  res.json(new customSuccess(updatedProd));
 }
+
 module.exports = {
   getAllProductsController,
   getSingleProductController,
   getMostRatedProductsController,
   getMostPopularProductsController,
   getProductsPaginationController,
-  postNewProductController
+  postNewProductController,
+  updateProductController
 };
