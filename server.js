@@ -1,10 +1,12 @@
 const express = require("express");
 const asyncHandler = require("./utils/asyncHandler");
-const customError = require("./utils/customResponces");
+const {customError} = require("./utils/customResponces");
 const { default: mongoose } = require("mongoose");
 const path=require('path');
 const ProductRouter = require("./routes/product");
 const AuthRouter = require("./routes/auth");
+const OrderRouter = require("./routes/order");
+const CommentRouter = require("./routes/comment");
 
 
 require("dotenv").config();
@@ -17,8 +19,8 @@ app.use(express.json())
 
 app.use('/api/product',ProductRouter)
 app.use('/api/auth',AuthRouter)
-// app.use('/api/order',OrderRouter)
-// app.use('/api/auth',AuthRouter)
+app.use('/api/order',OrderRouter)
+ app.use('/api/comment',CommentRouter)
 
 
 
@@ -26,8 +28,9 @@ app.use('/api/auth',AuthRouter)
 //404 handler
 app.all(
   "*",
-  asyncHandler(function (req, res) {
-    throw new customError("page not found", "fail", 404);
+  asyncHandler(async function (req, res,next) {
+ console.log("ehhhjhe")
+ throw new customError('url not found')
   })
 );
 
@@ -35,7 +38,6 @@ app.all(
 app.use(function (error, req, res, next) {
 
   res
-    .status(error.statusCode)
     .json({ status: error.status , error: error.message });
 });
 

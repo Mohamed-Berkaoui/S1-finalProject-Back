@@ -39,7 +39,6 @@ async function loginController(req,res){
     }
 
     const token=jwtGenerateToken(existUser._id)
-    console.log("🚀 ~ loginController ~ token:", token)
     res.json(new customSuccess(token))
 }
 module.exports = { registerController,loginController };

@@ -1,16 +1,17 @@
 
 class customError extends Error{
-    constructor(message,){
+    constructor(message){
         super(message)
         this.status="ERROR"
-        this.statusCode=400
+        this.statusCode=500
     }
 }
 class customFail extends Error{
     constructor(message){
-        super(message)
+        super()
+        this.message=message
         this.status="FAIL"
-        this.statusCode=500
+        this.statusCode=400
     }
 }
 

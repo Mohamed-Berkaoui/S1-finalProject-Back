@@ -5,6 +5,7 @@ const {
   customFail,
   customSuccess,
 } = require("../utils/customResponces");
+const catchDbErrors = require("../utils/catchDbErros");
 
 /**
  * @method : get
@@ -92,9 +93,9 @@ async function getMostPopularProductsController(req, res) {
  * @access : admin
  */
 async function postNewProductController(req, res) {
-  console.log(req.user.id)
+  console.log(req.user.id);
   const result = validationResult(req);
-  console.log('hellop')
+  console.log("hellop");
 
   if (!result.isEmpty()) {
     throw new customError(
@@ -119,17 +120,33 @@ async function postNewProductController(req, res) {
  * @access : admin
  */
 async function updateProductController(req, res) {
-  const product = await ProductModel.findById(req.params.id);
-  if (!product) {
-    throw new customFail("product not found");
-  }
 
-  const updatedProd = await ProductModel.findByIdAndUpdate(
+
+  const updatedProd = await catchDbErrors( ProductModel.findByIdAndUpdate(
     req.params.id,
     req.body,
     { returnDocument: "after" }
-  );
+  ))
+  if (!updatedProd) {
+    throw new customFail("product not found");
+  }
+
   res.json(new customSuccess(updatedProd));
+}
+
+
+/**
+ * @method : delete
+ * @route : ~/api/product/delete/:id
+ * @desc  : delete a product
+ * @access : admin
+ */
+async function deleteProductController(req, res) {
+const deletedProduct=await catchDbErrors(ProductModel.findByIdAndDelete(req.params.id))
+ if(!deletedProduct){
+  throw new customFail('product not found')
+ }
+res.json(new customSuccess(deletedProduct))
 }
 
 module.exports = {
@@ -139,5 +156,6 @@ module.exports = {
   getMostPopularProductsController,
   getProductsPaginationController,
   postNewProductController,
-  updateProductController
+  updateProductController,
+  deleteProductController
 };

@@ -1,4 +1,4 @@
-const { getAllProductsController, getSingleProductController, getMostRatedProductsController, getMostPopularProductsController, getProductsPaginationController, postNewProductController, updateProductController } = require('../controllers/product')
+const { getAllProductsController, getSingleProductController, getMostRatedProductsController, getMostPopularProductsController, getProductsPaginationController, postNewProductController, updateProductController, deleteProductController } = require('../controllers/product')
 const asyncHandler = require('../utils/asyncHandler')
 const productTitileValidation = require('../utils/expressValidator')
 const ProductRouter=require('express').Router()
@@ -63,7 +63,14 @@ ProductRouter.get('/item/:id',asyncHandler(getSingleProductController))
  * @desc  : update  exist product
  * @access : admin
  */
-    ProductRouter.put('/update/:id',asyncHandler(updateProductController))
+    ProductRouter.put('/update/:id',asyncHandler(verifyAdmin),asyncHandler(updateProductController))
 
+    /**
+ * @method : delete
+ * @route : ~/api/product/delete/:id
+ * @desc  : delete a product
+ * @access : admin
+ */
+    ProductRouter.delete('/delete/:id',asyncHandler(verifyAdmin),asyncHandler(deleteProductController))
 
 module.exports=ProductRouter
