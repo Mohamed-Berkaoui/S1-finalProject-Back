@@ -11,11 +11,9 @@ const jwtGenerateToken = require("../utils/jwtGenerateToken");
  *  */
 async function registerController(req, res) {
   const existEmail = await catchDbErrors(UserModel.findOne({ email: req.body.email }))
-
   if (existEmail) {
     throw new customFail("mail allready used");
   }
-  
   const newUser = new UserModel(req.body);
   await catchDbErrors(newUser.save());
   res.json(new customSuccess(newUser));
@@ -28,7 +26,8 @@ async function registerController(req, res) {
  * @accsess visitor
  *  */
 async function loginController(req,res){
-    const existUser= await catchDbErrors(UserModel.findOne({email:req.body.email}))
+
+    let existUser= await catchDbErrors(UserModel.findOne({email:req.body.email},{isAdmin:0,__v:0}))
     if(!existUser){
         throw new customFail('somthing went wrong1 ')
     }
@@ -39,6 +38,8 @@ async function loginController(req,res){
     }
 
     const token=jwtGenerateToken(existUser._id)
-    res.json(new customSuccess(token))
+existUser.password=""
+
+    res.json(new customSuccess({token:token,user:existUser}))
 }
 module.exports = { registerController,loginController };

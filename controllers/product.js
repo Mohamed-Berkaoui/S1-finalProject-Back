@@ -29,13 +29,16 @@ async function getAllProductsController(req, res) {
  */
 async function getProductsPaginationController(req, res) {
   const title = new RegExp(req.query.title, "i");
-  let products = await ProductModel.find({ title: title })
+  const category = new RegExp(req.query.category, "i");
+  let products = await ProductModel.find({ title: title,category:category })
     .skip((+req.query.page - 1) * +req.query.posts)
     .limit(req.query.posts);
+    let productsCount=await ProductModel.find({ title: title,category:category })
+    productsCount=productsCount.length
   if (!products.length) {
     throw new customFail("no product found");
   }
-  res.json(new customSuccess(products));
+  res.json(new customSuccess({products,productsCount}));
 }
 
 /**
@@ -61,7 +64,7 @@ async function getSingleProductController(req, res) {
 async function getMostRatedProductsController(req, res) {
   const products = await ProductModel.aggregate([
     { $sort: { "rate.rating": -1 } },
-    { $limit: 5 },
+    { $limit: 4 },
   ]);
   if (!products.length) {
     throw new customError(" products not found", "fail", 400);
@@ -78,7 +81,7 @@ async function getMostRatedProductsController(req, res) {
 async function getMostPopularProductsController(req, res) {
   const products = await ProductModel.aggregate([
     { $sort: { saleCount: -1 } },
-    { $limit: 5 },
+    { $limit: 4 },
   ]);
   if (!products.length) {
     throw new customError(" products not found", "fail", 400);
@@ -95,8 +98,6 @@ async function getMostPopularProductsController(req, res) {
 async function postNewProductController(req, res) {
   console.log(req.user.id);
   const result = validationResult(req);
-  console.log("hellop");
-
   if (!result.isEmpty()) {
     throw new customError(
       "message from express validator, title must be longer the 3  words",

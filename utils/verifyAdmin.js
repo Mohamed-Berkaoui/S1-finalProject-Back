@@ -8,6 +8,7 @@ async function verifyAdmin(req, res, next) {
     req.headers.Autorization ||
     req.headers.Authorization ||
     req.headers.authorization;
+
   jwt.verify(token, process.env.JWT, async function (err, decoded) {
     if (err) {
       res.json(new customFail("unauthorized"));

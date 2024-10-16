@@ -59,9 +59,13 @@ async function getProductCommentsController(req, res) {
  * @access user
  */
 async function deleteCommentsController(req, res) {
+  
   const comment = await catchDbErrors(CommentModel.findById(req.params.id));
-
+if(!comment){
+  throw new customFail("comment not found")
+}
   console.log( req.user._id.toString()== comment.userId.toString())
+
   if ( req.user._id.toString()!== comment.userId.toString()) {
     
     throw new customFail("unauthorized");
@@ -69,8 +73,23 @@ async function deleteCommentsController(req, res) {
   const deletedComment = await catchDbErrors(CommentModel.findByIdAndDelete(req.params.id));
   res.json(new customSuccess(deletedComment))
 }
+
+
+/**
+ * @method delete
+ * @endpoint  ~/api/comment/deleteadmin/:id
+ * @description delete Comments
+ * @access admin
+ */
+async function adminDeleteCommentController(req, res) {
+
+  const deletedComment = await catchDbErrors(CommentModel.findByIdAndDelete(req.params.id));
+
+  res.json(new customSuccess(deletedComment))
+}
 module.exports = {
   postNewCommentController,
   getProductCommentsController,
   deleteCommentsController,
+  adminDeleteCommentController
 };

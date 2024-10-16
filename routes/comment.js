@@ -1,4 +1,4 @@
-const {getProductCommentsController, postNewCommentController, deleteCommentsController} = require('../controllers/comment')
+const {getProductCommentsController, postNewCommentController, deleteCommentsController, adminDeleteCommentController} = require('../controllers/comment')
 const asyncHandler = require('../utils/asyncHandler')
 const CommentRouter=require('express').Router()
 const verifyAdmin=require('../utils/verifyAdmin')
@@ -31,5 +31,15 @@ CommentRouter.get('/getcomments/:productId',asyncHandler(getProductCommentsContr
  */
 
 CommentRouter.delete('/delete/:id',asyncHandler(verifyUser),asyncHandler(deleteCommentsController))
+
+
+/**
+ * @method delete
+ * @endpoint  ~/api/comment/deleteadmin/:id
+ * @description delete Comments
+ * @access admin
+ */
+
+CommentRouter.delete('/deleteadmin/:id',asyncHandler(verifyAdmin),asyncHandler(adminDeleteCommentController))
 
 module.exports=CommentRouter
