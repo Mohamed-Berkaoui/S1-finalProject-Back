@@ -9,7 +9,7 @@ const OrderRouter = require("./routes/order");
 const CommentRouter = require("./routes/comment");
 const UserRouter = require("./routes/user");
 require("dotenv").config();
-var cors = require('cors')
+var cors = require('cors') 
 //multer params
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {

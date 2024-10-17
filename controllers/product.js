@@ -48,7 +48,7 @@ async function getProductsPaginationController(req, res) {
  * @access : visitor
  */
 async function getSingleProductController(req, res) {
-  const product = await ProductModel.findById(req.params.id);
+  const product = await catchDbErrors(ProductModel.findById(req.params.id));
   if (!product) {
     throw new customError(" product not found", "fail", 400);
   }

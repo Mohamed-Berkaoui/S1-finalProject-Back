@@ -10,7 +10,7 @@ async function verifyUser(req, res, next) {
   req.headers.authorization;
    jwt.verify(token, process.env.JWT, async function (err, decoded) {
     if (err) {
-      res.json(new customFail("unauthorized")) 
+      res.status(403).json(new customFail("unauthorized")) 
       return
     }
     const user=await catchDbErrors(UserModel.findById(decoded.id,{password:0}))

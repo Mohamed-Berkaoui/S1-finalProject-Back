@@ -24,7 +24,7 @@ async function postNewCommentController(req, res) {
     })
   );
   if (req.body.rating > 0) {
-    const a = product.rate.rating * product.rate.ratingCount + req.body.rating;
+    const a = product.rate.rating * product.rate.ratingCount + +req.body.rating;
     const newReating = a / (product.rate.ratingCount + 1);
     product.rate.rating = newReating;
     product.rate.ratingCount += 1;
@@ -47,8 +47,11 @@ async function getProductCommentsController(req, res) {
     throw new customFail("product not found");
   }
   const productComments = await catchDbErrors(
-    CommentModel.find({ productId: product._id })
+    CommentModel.find({ productId: product._id }).populate("userId")
   );
+  productComments.forEach(element => {
+    element.userId.password="" 
+  });
   res.json(new customSuccess(productComments));
 }
 
