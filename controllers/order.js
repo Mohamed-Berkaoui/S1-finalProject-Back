@@ -1,6 +1,7 @@
 const OrderModel = require("../models/order");
 const catchDbErrors = require("../utils/catchDbErros");
 const { customFail, customSuccess } = require("../utils/customResponces");
+const ProductModel = require("../models/product");
 
 /**
  * @method : get
@@ -9,7 +10,7 @@ const { customFail, customSuccess } = require("../utils/customResponces");
  * @access : admin
  */
 async function getAllOrdersController(req, res) {
-  const orders = await catchDbErrors(OrderModel.find());
+  const orders = await catchDbErrors(OrderModel.find().populate("userId"))
   if (!orders.length) {
     throw new customFail("no orders found")
   }
@@ -25,7 +26,13 @@ async function getAllOrdersController(req, res) {
  */
 async function getuserOrdersController(req, res) {
     const user=req.user
-    const userOrders=await catchDbErrors(OrderModel.find({userId:user._id}))
+    const userOrders=await catchDbErrors(OrderModel.find({userId:user._id}).populate({ 
+      path: 'orderdProducts',
+      populate: {
+        path: 'productId',
+        model: 'product'
+      } 
+   }))
     if(!userOrders.length){
         throw new customFail("no orders")
     }
@@ -43,9 +50,32 @@ async function getuserOrdersController(req, res) {
     if(!order){
         throw new customFail('order not found')
     }
+    if(order.status=="done"){
+      order.orderdProducts.map(async (item)=> await catchDbErrors(ProductModel.findByIdAndUpdate(item.productId._id,{$inc:{saleCount:item.quantity}})))
+    }
     res.json(new customSuccess(order))
   }
 
+    /**
+ * @method : get
+ * @route : ~/api/order/:id
+ * @desc  : get single order
+ * @access : admin
+ */
+    async function getSingleOrder(req, res) {
+      const order=await catchDbErrors(OrderModel.findById(req.params.id).populate({ 
+        path: 'orderdProducts',
+        populate: {
+          path: 'productId',
+        } 
+     }))
+      if(!order){
+          throw new customFail('order not found')
+      }
+      res.json(new customSuccess(order))
+    }
+  
+  
 
     /**
  * @method : post
@@ -55,12 +85,10 @@ async function getuserOrdersController(req, res) {
  */
     async function postNewOrderContoroller(req, res) {
         const user=req.user
-
-        const newOrder=await catchDbErrors(OrderModel.create({userId:user._id,orderdProducts:req.body.order}))
-
+        const newOrder=await catchDbErrors(OrderModel.create({userId:user._id,orderdProducts:req.body.orderdProducts,address:req.body.address,paymentMethod:req.body.paymentMethod}))
         if(!newOrder){
            throw new customFail('somthing went wrong')
         }
         res.json(new customSuccess(newOrder))
       }
-module.exports={getAllOrdersController,getuserOrdersController,updateOrderStatusController,postNewOrderContoroller}
+module.exports={getAllOrdersController,getuserOrdersController,getSingleOrder,updateOrderStatusController,postNewOrderContoroller}

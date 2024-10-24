@@ -31,6 +31,7 @@ async function getProductsPaginationController(req, res) {
   const title = new RegExp(req.query.title, "i");
   const category = new RegExp(req.query.category, "i");
   let products = await ProductModel.find({ title: title,category:category })
+  
     .skip((+req.query.page - 1) * +req.query.posts)
     .limit(req.query.posts);
     let productsCount=await ProductModel.find({ title: title,category:category })
@@ -96,7 +97,8 @@ async function getMostPopularProductsController(req, res) {
  * @access : admin
  */
 async function postNewProductController(req, res) {
-  console.log(req.user.id);
+  console.log(req.file
+  );
   const result = validationResult(req);
   if (!result.isEmpty()) {
     throw new customError(
@@ -107,7 +109,7 @@ async function postNewProductController(req, res) {
   }
   var newProd;
   try {
-    newProd = await ProductModel.create(req.body);
+    newProd = await ProductModel.create({...req.body,image:"/"+req.file.filename});
   } catch (error) {
     throw new customError(error.message, "errorrrrr", 400);
   }
@@ -121,7 +123,7 @@ async function postNewProductController(req, res) {
  * @access : admin
  */
 async function updateProductController(req, res) {
-
+console.log(req.body)
 
   const updatedProd = await catchDbErrors( ProductModel.findByIdAndUpdate(
     req.params.id,

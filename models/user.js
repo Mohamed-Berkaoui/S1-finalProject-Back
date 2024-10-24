@@ -13,7 +13,8 @@ const userSchema=new Schema({
     password:{type:String,required:true},
     avatar:{type:String,default:"/images.png"},
     addresses:[{type:String}],
-    isAdmin:{type:Boolean,default:false}
+    isAdmin:{type:Boolean,default:false},
+    validUser:{type:Boolean,default:false}
 })
 
 userSchema.pre('save', function(next) {

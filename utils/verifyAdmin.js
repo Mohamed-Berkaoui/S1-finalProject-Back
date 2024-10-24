@@ -9,6 +9,7 @@ async function verifyAdmin(req, res, next) {
     req.headers.Authorization ||
     req.headers.authorization;
 
+  
   jwt.verify(token, process.env.JWT, async function (err, decoded) {
     if (err) {
       res.json(new customFail("unauthorized"));
@@ -22,6 +23,7 @@ async function verifyAdmin(req, res, next) {
     }
 
     req.user = decoded;
+  
     next();
   });
 }

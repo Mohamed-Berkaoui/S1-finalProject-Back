@@ -28,6 +28,8 @@ var cors = require('cors')
 const app = express();
 //app middelwares
 app.use(express.static(path.join(__dirname,"uploads")))
+app.use(express.static(path.join(__dirname,"products")))
+// app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 app.use(cors())
 

@@ -1,4 +1,4 @@
-const { getAllOrdersController, getuserOrdersController, updateOrderStatusController, postNewOrderContoroller } = require('../controllers/order')
+const { getAllOrdersController, getuserOrdersController, updateOrderStatusController, postNewOrderContoroller, getSingleOrder } = require('../controllers/order')
 const asyncHandler = require('../utils/asyncHandler')
 const OrderRouter=require('express').Router()
 const verifyAdmin=require('../utils/verifyAdmin')
@@ -11,6 +11,14 @@ const verifyUser = require('../utils/verifyUser')
  * @access : admin
  */
 OrderRouter.get('/',asyncHandler(verifyAdmin),asyncHandler(getAllOrdersController))
+/**
+ * @method : get
+ * @route : ~/api/order/item/:id
+ * @desc  : get all Orders
+ * @access : admin
+ */
+OrderRouter.get('/item/:id',asyncHandler(verifyAdmin),asyncHandler(getSingleOrder))
+
 
 /**
  * @method : get

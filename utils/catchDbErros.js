@@ -1,11 +1,11 @@
-const { customError } = require("./customResponces")
+const { customError, customFail } = require("./customResponces")
 
 async function catchDbErrors(statment){
 
 try {
     return await statment
 } catch (error) {
-    throw new customError(error.message)
+  throw new customFail(error.message)
 }
 
 }
